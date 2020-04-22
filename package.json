@@ -1,0 +1,20 @@
+{
+  "name": "maintainer-repo",
+  "version": "1.0.0",
+  "description": "this is used to pull the repo details of different repos and creates a repoDetail.json file",
+  "main": "main/index.js",
+  "scripts": {
+    "test": "jest"
+  },
+  "bin": {
+    "repo": "./main/index.js"
+  },
+  "author": "sakthivel.rajendran",
+  "license": "ISC",
+  "dependencies": {
+    "node-fetch": "^2.6.0"
+  },
+  "devDependencies": {
+    "jest": "^25.4.0"
+  }
+}
