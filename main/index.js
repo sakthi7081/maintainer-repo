@@ -1,51 +1,55 @@
 const fetch = require("node-fetch");
-const fs = require('fs');
 const cron = require("node-cron");
-const git = require('simple-git');
 
 const Repos = ['repo1','repo2','repo3'];
 
 const BitRepo = 'https://api.bitbucket.org/2.0/repositories/sakthivel434/';
 
+const GitRepo = 'https://api.github.com/repos/sakthi7081/maintainer/contents/';
+
+const GitFile = 'src/actions/RepoFolders.json';
+
 const File = '/src/master/package.json';
 
-const USER = 'sakthi7081';
-const PASS = 'sakthi@70';
-const REPO = 'git@github.com:sakthi7081/sample-repo.git';
-
-
-const remote = `https://${USER}:${PASS}@${REPO}`;
+const Token = 'Bearer e5769c0236044b862cde18cdcbeecdb47fb24fb8';
 
 let requests = Repos.map(repo => BitRepo +  repo + File);
 
-const getRepo = async (repo) => {
-    const result = await fetch(repo);
+const getURL = async (url) => {
+    const result = await fetch(url);
     const json = await result.json();
-    return json.Response;
+    return json;
   };
 
-  const getData = (fileName) => {
-    return Promise.all(requests.map(item => getRepo(item))).then(data => {
-      let response = {Transaction : true, Response : data};
-      fs.writeFile(fileName, JSON.stringify(response,null,2), () => { 
-        require('simple-git')()
-        .add('./*')
-        .commit('Commited JSON file on '+ (new Date()))
-        // .addRemote('origin', remote)
-        .push(['-u', 'origin', 'master'], () => console.log('done'));               
-          // git.add('./RepoFile.json').commit('Commited JSON file on '+ (new Date()))
-          // .addRemote('origin', remote)
-          // .push(['-u', 'origin', 'master'], () => console.log('done'));
-    });
+  const getData = () => {    
+    return Promise.all(requests.map(item => getURL(item))).then(async data => {      
+      let repoDetail = await getURL(GitRepo + GitFile);       
+      let repoJson = {Transaction : true, Response : data.map(value => value.Response)};
+      let oldData = JSON.parse(new Buffer.from(repoDetail.content, 'base64').toString('ascii'));      
+      if(JSON.stringify(repoJson) != JSON.stringify(oldData)){      
+        let repoData = new Buffer.from(JSON.stringify(repoJson,null,2)).toString('base64');      
+        let body = {
+              message : 'update on ' + new Date(),
+              content : repoData,
+              sha : repoDetail.sha
+            };
+        fetch(GitRepo + GitFile, {
+          method: 'PUT',
+          headers: {
+            'Authorization': Token,          
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify(body)
+        }).then(response => response.json()).then(res => res);        
+        return true
+      }
+      return false
   });
   }
 
-  getData('RepoFile.json');
+  getData();
 
-  // var task = cron.schedule("* * * * 6",getData('RepoFile.json'));
-
-  // task.start();
-
+  cron.schedule("* * * * 6",getData);  
   
  
 module.exports = getData;

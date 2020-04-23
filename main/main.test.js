@@ -1,20 +1,22 @@
 const getData = require('./index');
-const fs = require('fs');
-jest.mock('fs');
 
-describe('Test the Repo write functionality',()=>{
+const fetch = require('node-fetch');
+
+jest.mock('node-fetch');
+
+describe('Test the Repo update functionality',()=>{
     
-    it('Should write the file in the repo',async ()=>{               
-        console.log = jest.fn();        
-        fetch = jest.fn().mockResolvedValue({
-            json: () => data
-        });          
-        jest.spyOn(fs, 'writeFile').mockImplementation((path, options, callback) => 
-            console.log('Repo data saved!')
-        )       
-        await getData('somefile');             
-        expect(console.log).toHaveBeenCalledWith('Repo data saved!');
+    it('Should return the result as true',async ()=>{          
+        fetch.mockResolvedValue({ json: () => ({ content: 'eyJUcmFuc2FjdGlvbiIgOiB0cnVlLCJSZXNwb25zZSIgOiBbInNhbXBsZSIsInNhbXBsZSIsInNhbXBsZSJdfQ==',Response: 'sample' }) });                                                         
+        let response = await getData();
+        expect(response).toBe(false);                             
     });
 
+    it('Should return the result as false',async ()=>{          
+        fetch.mockResolvedValue({ json: () => ({ content: 'eyJUcmFuc2FjdGlvbiIgOiB0cnVlLCJSZXNwb25zZSIgOiBbInNhbXBsZSIsInNhbXBsZSIsInNhbXBsZSJdfQ==',Response: 'sample1' }) });                                                         
+        let response = await getData();
+        expect(response).toBe(true);                             
+    });
+      
 });
         
