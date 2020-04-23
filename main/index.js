@@ -31,7 +31,7 @@ const getRepo = async (repo) => {
         require('simple-git')()
         .add('./*')
         .commit('Commited JSON file on '+ (new Date()))
-        .addRemote('origin', remote)
+        // .addRemote('origin', remote)
         .push(['-u', 'origin', 'master'], () => console.log('done'));               
           // git.add('./RepoFile.json').commit('Commited JSON file on '+ (new Date()))
           // .addRemote('origin', remote)
