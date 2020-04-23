@@ -4,7 +4,8 @@
   "description": "this is used to pull the repo details of different repos and creates a repoDetail.json file",
   "main": "main/index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node main/index.js"
   },
   "bin": {
     "repo": "./main/index.js"
