@@ -1,5 +1,17 @@
 const fetch = require("node-fetch");
 const cron = require("node-cron");
+const express = require('express');
+const favicon = require('express-favicon');
+const path = require('path');
+const port = process.env.PORT || 8080;
+const app = express();
+
+app.use(favicon(__dirname + '/public/favicon.ico'));
+app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, 'public')));
+app.get('/', function (req, res) {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
 
 const Repos = ['repo1','repo2','repo3'];
 
@@ -42,14 +54,14 @@ const getURL = async (url) => {
           body: JSON.stringify(body)
         }).then(response => response.json()).then(res => res);        
         return true
-      }
+      }      
       return false
   });
   }
-
-  getData();
-
-  cron.schedule("* * * * 6",getData);  
   
- 
+  app.listen(port,() => {        
+    getData();
+    cron.schedule("* * * * 6",getData);  
+  }); 
+
 module.exports = getData;
